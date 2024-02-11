@@ -44,7 +44,7 @@ text into a decently sophisticated document 'at the push of a button',
 with enough options to vary its appearance.
 
 ## text2troff_table
-text2troff_table is a bash script that uses \f2awk\fP filtering to convert tabulated lines
+text2troff_table is a bash script that uses awk filtering to convert tabulated lines
 in a flat text-file into TROFF formatted tables by inserting table requests and ms macros.
 All lines not interpreted as table lines are passed on unchanged.
 The result is sent to standard output,
@@ -69,9 +69,9 @@ This special 'tmac.s' macro-file is in the public domain,
 can be found on the web,
 and should preferrably be renamed differently as to avoid collisions with the natively installed ms-macro files.
 In order to process the output correctly,
-groff must be given option \fB-M\fP with the path to the directory where the AT&T macro-file resides.
+groff must be given option -M with the path to the directory where the AT&T macro-file resides.
 
-trofform can be called both interactively (by options \fB-I\fP and \fB-h\fP) and non-interactively (by specifying no or any of the other options).
+trofform can be called both interactively (by options -I and -h) and non-interactively (by specifying no or any of the other options).
 
 # How to Use Your Project:
 See the manpages included in this repository
