@@ -6,7 +6,7 @@ text2troff - converts a flat text-file to TROFF text format by inserting request
 ## text2troff_table
 text2troff_table - converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests.
 
-## text2troff_table
+## trofform
 trofform - activates a chosen TROFF document format and deactivates any alternate document formats.
 
 # Description:
@@ -15,7 +15,7 @@ trofform - activates a chosen TROFF document format and deactivates any alternat
 text2troff is a bash script that uses a combination of awk and sed filters
 to convert a flat text-file into TROFF text format, by inserting TROFF request and `ms' macro commands.
 The result is sent to standard output,
-and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+and can be processed further with available 'troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
 As an alternative to processing a text-file, text2troff can also read (text) input from a pipe.
 
@@ -48,7 +48,7 @@ text2troff_table is a bash script that uses \f2awk\fP filtering to convert tabul
 in a flat text-file into TROFF formatted tables by inserting table requests and ms macros.
 All lines not interpreted as table lines are passed on unchanged.
 The result is sent to standard output,
-and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+and can be processed further with available 'troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
 As an alternative to processing a text-file, text2troff_table can also read (text) input from a pipe. 
 
@@ -59,7 +59,7 @@ It does so by reducing the number of dots prefixed to the ms macro belonging to 
 and by prefixing two (2) dots to all other document formats ms macros.
 Unaffected text lines are passed on unchanged, and the result is sent to standard output.
 
-The output can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+The output can be processed further with available 'troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
 As an alternate to processing a text-file, trofform can also read (text) input from a pipe.
 
