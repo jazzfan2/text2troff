@@ -1,1 +1,190 @@
-/home/rob/scripts/manpages/text2troff_table.1
+./" Manpage for your_function
+.TH TEXT2TROFF_TABLE 1 "18 December 2023" "1.0"
+.
+.
+.
+.SH NAME
+text2troff_table \(en converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests. 
+.
+.
+.
+.SH SYNOPSIS
+text2troff_table [\fIoptions\fP] [\fIinput-file\fP]
+.
+.
+.
+.SH DESCRIPTION
+text2troff_table is a bash script that uses \f2awk\fP filtering to convert tabulated lines
+in a flat text-file into TROFF formatted tables by inserting table requests and ms macros.
+All lines not interpreted as table lines are passed on unchanged.
+The result is sent to standard output,
+and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
+As an alternative to processing a text-file, text2troff_table can also read (text) input from a pipe.  
+.
+.
+.
+.SH INPUT TEXT REQUIREMENTS
+In order to be interpreted as a table, lines must appear clustered as a continuous series of two (2)
+or more text lines, each containing at least two (2) non-adjacent \f2tab\fP characters,
+excluding any leading or trailing \f2tab\fPs per line.
+This means that a minimum of three (3) text columns is required to be interpreted as a table.
+.LP
+Any continuous series of one or more \f2tab\fPs within a text line is treated as \f3one\fP
+delimiter between adjacent table-`cells' c.q. columns.
+This enables the use of multiple \f2tab\fPs in the input text, for instance to allign text 
+belonging to the same column for the sake of readibility. 
+As a consequence,
+table cells supposed to be `empty' shall be filled by at least a \f2space\fP or e.g. a \f2dash\fP (\fC-\fP)
+or any other chosen character.
+Another consequence is that a \f2tab\fP character itself can \(en by definition \(en 
+never be part of the contents of a table cell.
+.br
+All text intended to be in a single table row shall be placed on the same text line.
+.SH OPTIONS
+text2troff_table takes the following options:
+.IP "\f3-h\fP"
+Print `usage' text for help.
+.IP "\f3-e\fP"
+Expand tables to full width of the running text margins. 
+.br
+Without this option, tables are centered with respect to the running text margins and not wider than
+strictly required by content.
+.IP "\f3-s\fP"
+Force (`squeeze') tables containing too many columns and/or unbreakable text to fit within running 
+text margins, by adding invisible break characters \: to the contained text.
+.
+.
+.SH "TEXT TRANSFORMATION TO TROFF FORMAT" 
+First, text2troff_table removes any amount of \f2tab\fPs at the beginning or end of each line,
+and it replaces any contiguous series of \f2tab\fPs within a text line by just one \f2tab\fP.
+Not affected though are text lines within `displays',
+as marked by presence of ms macros \f3\f8.DS\f1 (`display starts') and \f3\f8.DE\f1
+(`display ends').
+Also all ISO-8859 characters are converted to UTF-8,
+and \f2return\fP characters (\fC\\r\fP) are removed.
+.LP
+Next, text2troff_table treats any contiguous cluster of two (2) or more text lines as a table,
+if each contains at least two (2) non-adjacent \f2tab\fP characters.
+The table is terminated as soon as a line passes that doesn't meet above conditions.
+At any following cluster of lines that again complies, a next table starts.
+.LP
+Per table, the column quantity is the maximum number of tab-delimited cells
+found in any of its lines.
+.LP
+The table-number is not hard-coded but instead driven by a TROFF register variable,
+which is automatically incremented during interpretation by groff_ms.
+.LP
+Default font size within the tables is set at the default point size minus 20%.
+Latter value is defined by a second TROFF register variable.
+To set both variables,
+text2troff_table inserts the following two lines at the top of the input text:\f1
+.LP
+.TS
+lw(30) lw(40).
+T{
+.nf
+\&\fC.nr table_nr 0
+\&.nr ps_decr \\n[.s]*2/10\fP  
+.fi
+T}	T{
+.nf
+Initialize new number register `table_nr' at 0
+Set new number register `ps_decr' at 20% of point size
+.fi
+T}
+.TE
+.sp 0.6
+At the top of each table, two lines with ms macro \f3\f8.LP\f1 (`paragraph starts') and 
+\f3\f8.TS H\f1 (`table with header starts') respectively are inserted, 
+as well a number of requests defining the table header and other table properties.
+.sp
+Per table line, each individual table cell as delimited by adjacent tab(s) is:
+.IP -
+prefixed by \f3\f8T{\f1 and a \f2newline\fP character, and
+.IP -
+postfixed by a \f2newline\fP character and \f3\f8T}\f1
+.LP
+This formatting allows the text to be wrapped within the cell by breaking at \f2space\fPs and syllable 
+ends when processed by groff_ms.
+.LP
+Concluding each table, two lines with ms macro \f3\f8.TE\f1 (`table ends') and \f3\f8.LP\f1
+(`paragraph starts') respectively are inserted.
+.sp 0.5
+For example, the original text:
+.LP
+.IP
+.nf
+\fCAfter this line of main text, next lines represent a table:
+first cell	\f2 tab \fP	second cell: long text 	\f2 tab \fP  third cell
+fourth cell	\f2 tab \fP	fifth cell    \f2 tab \fP    	\f2 tab \fP  sixth cell
+Here the main text continues after the table ...\f1
+.fi
+.sp 0.5
+.LP
+is converted by text2troff_table the following way:
+.LP
+.IP
+.nf
+\fCAfter this line of main text, next lines represent a table:
+\&.LP                  	\f1Macro `paragraph starts'\fP
+\&.nr table_nr +1      	\f1Number register `table_nr' is incremented by 1\fP
+\&.ps -\\n[ps_decr]    	\f1Point size minus decrement value being 20% of point size\fP
+\&.TS H                	\f1Request `table with header starts'\fP
+\&Tabel \\n[table_nr]  	\f1Header text and incremented number register `table_nr'\f2
+\&table_type\fC, allbox;   	\f1Requests `\f2table_type\fP' and `box around every table cell'\fC
+\&c s s                	\f1Header cell centered (c), spans (s) each other column \fP
+\&l l l .              	\f1Each cell of next rows left (l) alligned \fP
+\&T{
+\&first cell           	\f[1]First row of table cells\fC
+\&T}\f2 tab \fPT{
+\&second cell: long text
+\&T}\f2 tab \fPT{
+\&third cell
+\&T}
+\&T{
+\&fourth cell          	\f1Second row of table cells\fP
+\&T}\f2 tab \fPT{
+\&fifth cell
+\&T}\f2 tab \fPT{
+\&sixth cell
+\&T}
+\&.TE                  	\f1Request `table ends'\fP
+\&.LP                  	\f1ms macro `paragraph starts'\fP
+\fCHere the main text continues after the table ...\fP
+.fi
+.sp 0.5
+.LP
+The \f2table_type\fP can be:
+.IP "\fCcenter\fP"
+In this default case, groff_ms will center the table between the text margins, at a width no more 
+than strictly required by table contents;
+.br
+.IP "\fCexpand\fP"
+if option \f3-e\fP is given, or if option \f3-s\fP is given and table exceeds text margins,
+groff_ms will expand the table to full width between the text margins.
+.LP
+if option \f3-s\fP is given, invisible break characters \\: are inserted in the table cell
+text after every \f2n\fP characters \(en with \f2n\fP depending on on table width,
+chosen number of columns and character type and size \(en as to have groff_ms break the lines and 
+`squeeze' the table between text margins.
+.
+.
+.SH COMPATIBILITY
+.PP
+This program has been tested to run on both GNU/Linux (Ubuntu 22.04, Tiny Core Linux 10, Alpine Linux 3.12 
+within iSH app on iOS smartphone), as well as on MacOS X.
+.
+.
+.
+.SH BUGS
+No known bugs.
+.
+.
+.SH AUTHOR
+Written by Rob Toscani (rob_toscani@yahoo.com)
+.
+.
+.
+.SH REPORTING BUGS
+Please report any bugs to the author by e-mail or via https://github.com/jazzfan2/text2troff/issues

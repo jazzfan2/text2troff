@@ -1,1 +1,898 @@
-/home/rob/scripts/manpages/text2troff.1
+./" Manpage for your_function
+.TH TEXT2TROFF 1 "18 December 2023" "1.0"
+.
+.
+.
+.SH NAME
+text2troff \(en converts a flat text-file to TROFF text format by inserting requests and `ms' macro commands. 
+.
+.
+.
+.SH SYNOPSIS
+text2troff [\fIoptions\fP] [\fIinput-file\fP]
+.
+.
+.
+.SH DESCRIPTION
+text2troff is a bash script that uses a combination of \f2awk\fP and \f2sed\fP filters
+to convert a flat text-file into TROFF text format, by inserting TROFF request and `ms' macro commands.
+The result is sent to standard output,
+and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
+As an alternative to processing a text-file, text2troff can also read (text) input from a pipe.  
+.PP
+The functionality includes interpretation of
+chapter headers,
+paragraphs,
+emphasized text,
+bullet item lists (whether or not nested),
+tables,
+footnotes and
+`code blocks' (definition see below).
+It offers various options to set general text font family, style, size and color,
+the number of text columns per page, representation of chapter headers, paragraphs and tables,
+as well as end-of-sentence behavior.
+An option to automatically generate and include a Table of Contents (TOC) is present as well.
+.PP
+text2troff offers an alternative to pandoc(1) for producing TROFF text output,
+by attempting to minimize as much as possible the degree of formatting required in the input text,
+yet enabling still highly acceptable text typesetting based on a very limited set of simple conventions.
+These are used by text2troff as criteria by which to `best-guess' the intended layout of the text.
+.PP
+The output produced by this program shouldn't be considered as more than an approximation of any full-blown end result.
+Further polishing can be done by any additional manual placement of TROFF-requests and/or ms macros if chosen for. 
+Main intent for developing this program was the wish to be able to turn a quick-and-dirty piece of flat
+text into a decently sophisticated document `at the push of a button',
+with enough options to vary its appearance.
+.
+.
+.
+.SH INPUT TEXT REQUIREMENTS
+.PP
+The following formatting conventions apply for flat input text in order to be interpreted properly:
+.IP "\f3Chapter headers\f1"
+shall be single text lines that are no longer than 90 characters,
+start with a capital letter or a number,
+do not end with a period, comma, semicolon or exclamation mark,
+and are both preceded and followed by an empty line (\f2space\fPs and \f2tab\fPs allowed).
+.
+.IP "\f3Paragraphs\f1"
+shall be preceded by an empty line, which may contain \f2tabs\fP or \f2space\fPs.
+.IP "\f3Emphasized text\f1"
+shall be surrounded by emphasis markers, consisting of one or more \f2asterisk\fPs, at both sides,
+e.g: \fC**text**\fP.  No \f2tab\fPs nor \f2space\fPs are allowed between the markers and the text.
+Each opening emphasis marker must be paired by a closing marker before a \f2tab\fP,
+an end-of-line or a footnote marker occurs.
+.IP "\f3Bullet list items\f1"
+may be nested, are not a part of a table or code-block,
+and shall start with a line with either of the following elements at the beginning (after optional \f2space\fPs or \f2tab\fPs):
+.RS
+.IP \(bu 3
+one of the characters \fC* + - #\fP or \fC->\fP followed by a \f2space\fP or \f2tab\fP, or
+.IP \(bu 3
+one of the following (combinations of) characters, followed by \fC) : . .) .]\fP or \fC]\fP and by a 
+\f2space\fP or \f2tab\fP:
+.RS
+.IP - 3
+Roman numerals composed of up to seven (7) lower case \f2letter\fPs \fCi v x l c\fP optionally preceded by 
+\fC[\fP or \fC(\fP as well
+.IP - 3
+a string consisting of up to eight (8) \f2digit\fPs, \f2space\fPs and/or \f2period\fPs
+.IP - 3
+an integer of up to four (4) \f2digit\fPs, followed by one (1) lower or upper case \f2letter\fP
+.IP - 3
+one (1) single upper or lower case \f2letter\fP
+.br
+or
+.RE
+.IP \(bu
+a string of any non-\f2tab\fP characters,
+followed by a \f2tab\fP only and (also in deviation of all previous possibilities) only one input text line
+.RE
+.IP "\f3Code-blocks\f1"
+are any (series of) lines that are supposed to have their literal flat text layout preserved,
+including monospace characters, line indents, spacing and breaks, and without any additional formatting.
+To distinguish a codeblock from preceding and succeeding text, following tags shall be present,
+separated by at least a \f2space\fP, a \f2tab\fP or a \f2newline\fP character from any other text:
+.RS
+.IP "\fC[code]\fP or \fC[code=\fIname\fC]\fP"
+with \fIname\fP = any set of words (e.g. a programming language),
+marks the beginning of a code-block, and is placed either at the beginning of the first code-block line, 
+or at the end of the preceding line, which may be the last previous non-code-block text line.
+.IP "\fC[/code]\fP"
+marks the end of a code-block, and is placed either at the end of the last code-block line,
+or at the beginning of the following line, which may be first next non-code-block text line. 
+\fC[/code]\fP may be placed at the end of the same line as where \fC[code]\fP is placed at the 
+beginning.
+.RE
+.IP
+A code-block can't be placed within a table.
+.RE
+.IP "\f3Tables\f1"
+are any contiguous series of two (2) or more text lines,
+each containing at least two (2) non-adjacent \f2tab\fP characters,
+excluding any leading or trailing \f2tab\fPs per line.
+This means that a minimum of three (3) text columns is required to be interpreted as a table.
+Any contiguous series of one or more \f2tab\fPs within a text line is treated as one delimiter between
+adjacent table-`cells' c.q. columns.
+This enables the use of multiple \f2tab\fPs in the input text, for instance to allign text belonging
+to the same column for the sake of readibility. 
+As a consequence,
+table cells supposed to be `empty' shall be filled by at least a \f2space\fP or e.g. a \f2dash\fP (\fC-\fP)
+or any other chosen character.
+Another consequence is that a \f2tab\fP character itself can \(en by definition \(en 
+never be part of the contents of a table cell.
+All text intended to be in a single table row shall be placed on the same text line.
+.IP "\f3Footnotes\f1"
+are text blocks starting with one or more \f2asterisk\fPs between \f2parentheses\fP e.g.: \fC(**)\fP at the 
+beginning of the line.
+A footnote ends with an empty line or if a next footnote starts.
+The corresponding marking point is placed after a word in the main text,
+and is a \f2space\fP or \f2tab\fP followed by one or more \f2asterisk\fPs and a closing \f2parenthesis\fP, e.g.: \fC**)\fP
+The number of \f2asterisk\fPs in marking point and corresponding footnote can be chosen freely and needn't
+be equal. 
+A footnote must start at the beginning of a line,
+may be placed anywhere in the text but is not interpreted if placed within a codeblock or table.
+It may however contain tables, bullet lists and code-blocks by itself.
+It doesn't need to be co-located near a marking point,
+so might be placed as far away as e.g. at the very beginning or end of the file,
+as the program will automatically associate footnotes to (the locations of) marking points,
+based on order of appearance.
+Marking points may appear in any text, including chapter headers, tables, bullet lists, 
+and in any quantity per textline.
+They are not interpreted however if placed within a codeblock or footnote.
+.
+.
+.
+.SH OPTIONS
+text2troff takes the following options:
+.IP "\fB-h\fP"
+Print `usage' text for help.
+.IP "\fB-B\fP"
+Revert any `solitary' bullet into main text.
+Solitary is defined as: the bullet is placed at a distance of more than 17 TROFF output lines
+from any other bullet item.
+(This option is not fully tested yet.)
+.IP "\fB-b\fP"
+Optimize output for `browser' only,
+meaning `troff' processing to HTML.
+By this option, text lines in a code-block are never broken,
+the number of text columns can be one (1) only,
+and font size can be 10 pts only.
+This option overrides options \fB-c\fP, \fB-d\fP, \fB-m\fP, \fB-t\fP and \fB-z\fP.
+Less suitable for `troff' processing to PDF or `nroff' processing within terminal.
+.IP "\fB-c\fP"
+Optimize output for `console' only,
+meaning `nroff' processing within terminal.
+By this option,
+text lines in code-blocks are broken by terminal window boundaries only,
+unless option \fB-b\fP or \fB-m\fP is given as well.
+Less suitable for `troff'-processing to PDF/HTML.
+This option overrides option \fB-z\fP
+.IP "\fB-d\fP"
+Format the output into double-column (2) layout instead of one (1) column,
+unless option \fB-b\fP is given as well.
+This option overrides option \fB-m\fP
+.IP "\fB-m\fP"
+Format the output into multi-column (\(>= 3) layout instead of one (1) column,
+unless option \fB-b\fP or \fB-d\fP is given as well.
+.IP "\fB-i\fP"
+Have every new paragraph start with an indented line. Without this option no indents are made.
+.IP "\fB-D\fP"
+Set TROFF creation date as the (fixed) document date.
+Without this option, groff_ms generates the (actual) document date while processing the TROFF-text.
+.IP "\fB-N\fP"
+Prefix all chapter headers by an automatically incremented number (to be generated by groff_ms),
+the first of which being 1.
+.IP "\fB-n\fP"
+Have each new line in the source text start on a new line in the typeset layout as well. 
+.IP "\fB-p\fP"
+Have the typeset layout continue on a new line after each end-of-sentence period (.) encountered in the
+source text. Without this option, all running text continues after a period
+and is filled out to the right margin.
+.IP "\fB-e\fP"
+Expand tables to full width of the running text margins,
+Without this option,
+tables are centered with respect to the running text margins and not wider than strictly required by content.
+.IP "\fB-s\fP"
+Force (`squeeze') tables containing too many columns and/or unbreakable text to fit within running 
+text margins, by adding invisible break characters \: to the contained text.
+.IP "\fB-t\fP"
+Automatically generate and include a Table of Contents (TOC),
+unless option \fB-b\fP is given as well.
+.IP "\fB-u\fP"
+Convert chapter header text from lower case to upper case.
+.IP "\fB-a\fP \fITYPE\fP"
+Convert characters with accent marks into escape-sequences.
+.br
+This option enables reproduction by groff_ms of such characters in case an UTF-8 locale is not available on the system.
+Allowed values for \fITYPE\fP are:
+.RS
+.IP "\fBg\fP" 
+GNU groff_char(7) escape-sequences
+.IP "\fBa\fP"
+AT&T ms legacy escape-sequences
+.IP "\fBb\fP"
+Berkeley ms legacy escape-sequences
+.RE
+.IP "\fB-f\fP \fIFONT\fP"
+Set general character font family as a replacement for `Times'.
+Allowed values for \fIFONT\fP are:
+.RS
+.IP "\fBH\fP" 
+Helvetica
+.IP "\fBh\fP"
+Helvetica Narrow
+.IP "\fBa\fP"
+Avant Garde
+.IP "\fBb\fP"
+Bookman
+.IP "\fBc\fP"
+Courier
+.IP "\fBn\fP"
+New Century Schoolbook
+.IP "\fBp\fP"
+Palatino
+.RE
+.IP "\fB-S\fP \fISTYLE\fP"
+Set general character style as a replacement for `Regular'.
+Allowed values for \fISTYLE\fP are:
+.RS
+.IP "\fBi\fP"
+Italic
+.IP "\fBb\fP"
+Bolt
+.IP "\fBbi\fP"
+Bolt Italic
+.RE
+.IP "\fB-z\fP \fISIZE\fP"
+Set general character size as a replacement for 10 pts,
+unless option \fB-b\fP or \fB-c\fP is given as well.
+Also accepts values with decimal point. 
+.IP "\fB-k\fP \fICOLOR\fP"
+Set general text color as a replacement for the default.
+Allowed values for \fICOLOR\fP are:
+.RS
+.IP "\fBa\fP"
+Aquamarine
+.IP "\fBb\fP"
+Blue
+.IP "\fBgn\fP"
+Green
+.IP "\fBgr\fP"
+Gray
+.IP "\fBm\fP"
+Magenta
+.IP "\fBo\fP"
+Olive
+.IP "\fBr\fP"
+Red
+.RE
+.
+.
+.
+.SH "TEXT TRANSFORMATION TO TROFF FORMAT" 
+.PP
+Following transformations are made by text2troff to the input text to generate the TROFF text format:
+.sp 0.5
+\f3Lines added at the top of the input text\f1
+.LP
+.TS
+l l.
+T{
+.nf
+\fC.RP
+\&...TR
+\&...IM
+\&...TM 76-1273-10 39199 39199-11
+\&...MF
+\&...MR
+\&...EG
+\&.ND "\f2TROFF creation date\fP"
+\&.fam \f2font_family\fP
+\&.fp \f2font_position\fP \f2style\fP
+\&.nr PS \f2point_size\fP
+\&.defcolor \f2color\fP rgb #\f2rgb_value\fP
+\\m[\f2color\fP]
+\&.nr HORPHANS 5
+\&.nr PORPHANS 3
+\&.nr chapt_nr 0 1
+\&.nr GROWPS 2
+\&.nr PSINCR 1.5p
+\&.AM
+\&.TL
+\\f3\f2filename\fP\\fP
+\&.AU "\f2location\fP" \f2contact\fP
+\f2author's name\fP
+\&.AI
+\f2author's institution\fP
+\&.AB
+\f2abstract text\fP
+\&.AE
+\&...CS 12 1 13 0 0 10
+\&.1C
+\&.nr table_nr 0
+\&.nr ps_decr \\n[.s]*2/10\fP
+.fi
+T}	T{
+.nf
+Activated ms macro for `Released Paper' format with cover sheet
+Deactivated authentic AT&T `Internal Memorandum' ms macro 
+same for `Computing Science Technical Report'
+same for `Technical Memorandum', with preset text string
+same for `Memorandum for File'
+same for `Memorandum for Record'
+same for `Engineer's Notes'
+Only with option \f3-D\fP: set TROFF creation date as document date
+Only with option \f3-f\fP: set \f2font_family\fP
+Only with option \f3-S\fP: set \f2font_positions\fP & \f2styles\fP (max 3x)             
+Set \f2point_size\fP unless with options \f3-b\fP and \f3-c\fP
+Define \f2color\fP w. \f2rgb_value\fP per \f3-k\fP option, empty otherwise
+Set \f2color\fP per \f3-kf\fP option, \f2color\fP empty otherwise 
+ms macro to set header orphans 
+ms macro to set paragraph orphans
+Set new number register `chapt_nr' at 0 with increment 1
+Set number of character size levels including headers
+Set character size increment at 1.5p
+Only with option \f3-a b\fP: ms macro for Berkeley accent escapes
+ms macro `document title'
+Name of the input text file as the document title 
+ms macro `author' with preset \f2location\fP and \f2contact\fP
+Preset \f2author's name\fP
+ms macro 'author's institution'
+Preset \f2author's institution\fP
+ms macro `begin abstract'
+Preset \f2abstract text\fP
+ms macro `end abstract'
+Deactivated special AT&T cover sheet macro with preset string
+\&`columns': \fC.2C\fP (optn \f3-d\fP unless \f3-b\fP), \fC.MC\f2 width\f1 (optns \f3-mcz\fP unless \f3-b\fP) 
+Initialize new number register `table_nr' at 0
+Set new number register `ps_decr' at 20% of point size
+.fi
+T}
+.TE
+.LP
+The macros at the beginning of above header allow variation in the appearance of the document,
+including a set of special macros by which to evoke some authentic AT&T document formats.
+In order to activate any of the latter, a separate program called `trofform(1)' is available.
+Additionally needed for this purpose is the original AT&T `tmac.s' macro-file,
+which is in the public domain and can be found on the web.
+.
+.
+.sp
+\f3General text treatment\f1
+.LP
+text2troff inserts a \f3\f8.br\f1 `break line' request underneath each line of
+input text that contains one or more \f2tab\fPs,
+or that contains a single string without a \f2space\fP or \f2tab\fP.
+If option \f3-n\fP is given, \f3\f8.br\f1 is inserted underneath all other lines as well.
+If option \f3-p\fP is given, lines are broken after each period that ends a sentence,
+and a \f3\f8.br\f1 request is inserted on a new line in between.
+.LP
+In all above cases an exception is made for lines within tables and code blocks,
+which are never provided with line break requests.
+The same applies for lines above a chapter header, or where text2troff also places a
+\f3\f8.LP\f1 or \f3\f8.PP\f1 or \f3\f8.IP\f1 macro on the previous or following line.
+.LP
+Removed from the text, except within code blocks, are:
+.IP \(bu 3
+\f2tabs\fP at the beginning or end of a line
+.IP \(bu 3
+\f2space\fPs at the beginning or end of a line, except within tables
+.IP \(bu 3
+any lines only consisting of minimally three (3) equal \fC-\fP  \fC+\fP  \fC=\fP  or  
+\fC#\fP characters
+.
+.
+.sp
+.PP
+\f3Character conversions\f1
+.IP \(bu 3
+All ISO-8859 encoded characters are re-encoded to UTF-8,
+and return characters (\fC\\r\fP) are removed.
+.IP \(bu 3
+Character combinations \fC->\fP  \fC<-\fP  \fC>=\fP  \fC<=\fP  \fC-\fP and  
+\fC+/-\fP are replaced by native TROFF  \f3\f8\\(\f2xy\f1 escape sequences,
+except if used in a code block.
+The same applies for other mathematical symbols and for Greek characters,
+but only if the locale is not set at UTF-8.
+.IP \(bu 3
+\fCIJ\fP and \fCij\fP are replaced by \f3\f8\\[IJ]\f1 and \f3\f8\\[ij]\f1 to make both 
+characters an unbreakable unity, except if used in a code block.
+.IP \(bu 3
+Characters with accent marks are copied to standard output or, if option \f3-a\fP is given,
+replaced by one the following escape sequence types, to have them represented correctly by
+groff_ms if the locale is not set at UTF-8:
+.RS
+.IP "" 3
+\fC\\*[\f2accent\fP]\f2character\fP\f1	AT&T ms escape sequences (option \f3-a a\fP)
+.IP "" 3
+\f2character\fC\\*[\f2accent\fP]\f1	Berkeley ms escape sequences (option \f3-a b\fP)
+.IP "" 3
+\fC\\[\f2accent character\fP]\f1	GNU escape sequences (option \f3-a g\fP)
+.RE
+.IP \(bu 3
+Each period at the beginning of a line (in codeblocks) or word (elsewere) is prefixed
+by \fC\\&\fP
+.IP \(bu 3
+Each backslash \fC\\\fP is prefixed by another backslash.
+.IP \(bu 3
+Following characters are postfixed by \fC\\:\fP to have groff_ms break strings not otherwise 
+breakable, except if used in a code block:
+.RS
+.IP "" 3
+\fC@\fP  \fC#\fP  \fC%\fP  \fC+\fP  \fC=\fP  and  \fC_\fP  not after a
+\f2tab\fP or \f2space\fP
+.IP "" 3
+\fC/\fP not after a \f2tab\fP or \f2space\fP or after  \fC+\fP
+.IP "" 3
+\fC!\fP  \fC?\fP  and  \fC-\fP  not after a \f2letter\fP or \f2tab\fP or after any
+of the characters \fC]\fP  \fC)\fP  \fC!\fP  \fC?\fP  \fC"\fP  \fC'\fP 
+or  \fC-\fP
+.RE
+.IP \(bu 3
+\f2Quote\fPs \fC' '\fP are converted to \fC` '\fP to have groff_ms produce neat typeset opening and closing quotes,
+except if used within a code block.
+.IP \(bu 3
+\f2Quote\fPs \fC" "\fP are converted to \fC`` ''\fP for same purpose,
+also except if used within a code block.
+.
+.
+.sp
+.PP
+\f3Character fonts, styles, sizes and text colors\f1
+.LP
+Default general character font is Times Roman 10 pts, colour is standard (not specified).
+Both general font, style, size and text color can optionally be replaced by different values.
+Following character styles and sizes are set for the text categories listed:
+.TS
+l lw(70).
+T{
+Chapter title headers
+T}	T{
+Bolt 11.5 pts (default), or bolt version of chosen style and point size plus 1.5
+T}
+T{
+Running text
+T}	T{
+Regular 10 pts (default), or chosen style and point size
+T}
+T{
+Text in tables
+T}	T{
+Regular 8 pts (default), or chosen style and 80% of point size
+T}
+T{
+Text in footnotes
+T}	T{
+Regular 8 pts (default), or chosen style and point size minus 2
+T}
+T{
+Text within code-blocks
+T}	T{
+Courier monospace font regular 10 pts (default), or chosen point size
+.br
+If placed within a footnote: point size minus 2
+T}
+T{
+Emphasized text
+T}	T{
+Bolt italic 10 pts (default), or chosen point size
+T}
+T{
+URLS (\fChttp(s)://...\fP)
+T}	T{
+Italic 10 pts (default), or italic version of chosen style and point size
+T}
+.TE
+.
+.
+.sp
+\f3Chapter headers and paragraphs:\f1
+.LP
+If text2troff interprets a text line that is both preceded and succeeded by an empty line
+as a chapter header,
+then it replaces the preceding empty line by three (3) separate dots followed by ms macro
+\f3\f8.SH 1\f1 (`sub-header with header level 1').
+.IP "The header line itself is prefixed by following series of escape sequences:"
+.nf
+\fC\\f[3]\\n+[chapt_nr]\\\f2space\fP\\\f2space\fP\\\f2space\f[P]\fP
+.fi
+.LP
+meaning bolt version of used font style, auto-incremented chapter number (if \f3-N\fP option
+is given), and three (3) unpaddable \f2space\fPs respectively.
+.IP "and, to return to previous font style, it is postfixed by:"
+.nf
+\fC\\f[P]\fP
+.fi
+.LP
+text2troff treats any group of remaining empty lines not appearing within code blocks nor 
+following a footnote as a paragraph beginning,
+and replaces it by ms macro \f3\f8.LP\f1 (`non-indented paragraph') or 
+\(en if option \f3-i\fP is given \(en by ms macro \f3\f8.PP\f1 (`indented paragraph').
+.LP
+.IP "For example, the original text:"
+.sp 0.6
+.nf
+\fCThis is the last line of the previous chapter.
+.sp
+This is a new chapter
+.sp
+First paragraph line starts here ...\fP
+.fi
+.sp 0.5
+.IP "is converted by text2troff into:"
+.sp 0.6
+.nf
+\fCThis is the last line of the previous chapter.
+\&.
+\&.
+\&.
+\&.SH 1
+\\f3\\n+[chapt_nr]\\ \\ \\ This is a new chapter\\fP
+\&.LP
+First paragraph line starts here ...
+.fi
+.
+.
+.
+.sp
+.PP
+\f3Table of Contents (TOC)\f1
+.LP
+If option \f3-t\fP is given,
+but unless option \f3-b\fP is given as well,
+a \f3\f8.TC\f1 (`Table of Contents') ms macro is inserted on a new line at the end of the text,
+and underneath each chapter header the following lines are inserted:
+.IP
+.TS
+l l.
+T{
+.nf
+\fC.XS
+\\m[\fIcolor\fP]\f2Chapter_header_text\fC
+\&.XE\fP
+.fi
+T}	T{
+.nf
+ms macro `start of this Table of Contents line'
+Header repeated, no footnote markers, color request prefixed
+ms macro `end of this Table of Contents line'
+.fi
+T}
+.TE
+.LP
+If \f3-N\fP option is given, a chapter number register call \fC\\n[chapt_nr].\fR is added
+between the color request and the chapter header text.
+groff_ms will now place a Table of Contents at the end of the typeset document.
+Using pdfroff -spdf instead of groff_ms, the table will be placed at the beginning of the document.
+.
+.
+.
+.sp
+.PP
+\f3Emphasized word combinations\f1
+.LP
+.IP "The strings of one or more \fC*\fP placed on both ends of emphasized text, as in following example:"
+.sp 0.6
+.nf
+\fCLine with an **emphasized text** fragment.\fP
+.fi
+.sp 0.4
+.IP "are converted by text2troff as follows, to have groff_ms produce bolt italic font style:"
+.sp 0.6
+.nf
+\fCLine with an \\f[BI]emphasized text\\f[P] fragment.\fP
+.fi
+.
+.
+.PP
+\f3Bullets representation, nesting en indenting\f1
+.LP
+Each character-string interpreted by text2troff as a bullet is placed between \f2double quote\fPs
+and is prefixed on the same line by ms macro \f3\f8.IP\f1 (`item pointer') and a \f2space\fP.
+Additionally, a \f3\f8\\m[\f2color\f3\f8]\f1 request is inserted between the opening \f2quote\fP
+and the bullet, with \f2color\f1 as chosen with \f3-k\fP option or empty otherwise.
+.br
+The text part to the right of the quoted bullet string is moved to a new line.
+.LP
+Following bullet types are converted to escape sequences representing a symbol: 
+.IP - 3
+Dash bullets  \fC-\fP  are changed to  \f3\f8\\(en\f1  to have groff_ms produce 
+an elongated dash: \(en
+.IP - 3
+Asterisk bullets  \fC*\fP  are changed to  \f3\f8\\(bu\f1  to have groff_ms 
+produce a filled circle: \(bu
+.IP - 3
+Right-arrow bullets  \fC->\fP  are changed to  \f3\f8\\(->\f1  to have groff_ms 
+produce a right arrow: \(->
+.LP
+Any indentation in the input text is removed.
+.LP
+Nested bullet lists are treated by text2troff such to make groff_ms horizontally shift a 
+bullet if this is provided with a different bullet type than its predecessor in the same list.
+In determining whether or not a bullet type change applies, text2troff treats
+any leading  \fC[  (\fP  and trailing  \fC:  .  )  ]\fP 
+characters and string length differences as non-destinctive.
+Furthermore, any remaining non-alphanumeric characters within strings are treated as (equal to) letters.
+Bullet differences are for instance: 
+.IP \(en 3
+Difference in used single bullet symbol: \fC- + * ->\fP  or  \fC#\fP 
+.IP \(en 3
+Any above symbol versus (strings of) alphanumerical characters
+.IP \(en 3
+Strings with leading letter(s) versus strings with leading digit(s):
+.IP \(en 3
+Digit strings without intermittent dots versus those with dots on distinct positions
+.LP
+If any difference remains, text2troff inserts one or more ms macros \f3\f8.RS\f1 (`right shift')
+or \f3\f8.RE\f1 (`left shift') on new lines on top of the item's \f3\f8.IP\f1 line.
+The program keeps track of shift position per bullet type and calculates the number
+of right shift and left shift macros needed to result in appropriate indent position.
+.LP
+The bullet list is considered terminated if an empty line is followed by a line without a bullet.
+The empty line is then replaced by a \f3\f8.LP\f1 macro, or \f3\f8.PP\f1 
+if option \f3-i\fP is given. 
+On top of the \f3\f8.LP\f1 or \f3\f8.PP\f1 macro, an appropriate number of \f3\f8.RE\f1
+macros is inserted in order to reset any remaining right shift.
+.LP
+.IP "For example, the original text:"
+.sp 0.6
+.nf
+\fCAfter this line of main text, a bullet items list starts:
+1.  Text of 1st main bullet item
+2)  Text of 2nd main bullet item
+*   Text of 1st sub bullet item
+*   Text of 2nd sub bullet item
+-   Text of 1st sub sub bullet item
+-   Text of 2nd sub sub bullet item
+.sp
+After an empty line, the main text continues ...\fP
+.fi
+.sp 0.5
+.IP "is converted by text2troff, if option \f3-kr\fP is given, into:"
+.sp 0.6
+.nf
+\fCAfter this line of main text, a bullet items list starts:
+\&.IP "\\m[red]1."
+Text of 1st main bullet item
+\&.IP "\\m[red]2)"
+Text of 2nd main bullet item
+\&.RS
+\&.IP "\\m[red]\\(bu" 3
+Text of 1st sub bullet item
+\&.IP "\\m[red]\\(bu" 3
+Text of 2nd sub bullet item
+\&.RS
+\&.IP "\\m[red]\\(en"
+Text of 1st sub sub bullet item
+\&.IP "\\m[red]\\(en"
+Text of 2nd sub sub bullet item
+\&.RE
+\&.RE
+\&.LP
+After an empty line, the main text continues ...\fP
+.fi
+.
+.
+.PP
+\f3Treatment of text within code-blocks\f1
+.LP
+The \fC[code]\fP tag is replaced by the same number of \f2space\fPs, and the \fC[/code]\fP tag
+is removed.
+.LP
+On top of the code block, ms macros \f3\f8.DS I 3\f1 (`display start' with indentation 3)
+and \f3\f8.CW\f1 (`constant width font') are inserted.
+Underneath the code block, ms macro \f3\f8.DE\f1 (`display end') is inserted.
+.LP
+Tabs within the code block are replaced by a number of \f2space\fPs consistent with original positioning
+and alligning, with the assumption that the \f2tab\fP is set to equal four (4) character positions.
+Removed are any empty lines (including \f2tab\fPs and/or \f2space\fPs) at the beginning and end of 
+code-blocks, as well as any amount of common indent, leaving only the differences in indent intact.
+.LP
+.IP "For example, the original input text:"
+.sp 0.6
+.nf
+\fCAfter this main text, a code-clock starts:
+[code]
+
+         some code text
+            some more indented code text
+      code text less indented than first line
+
+[/code]
+Main text continues here ...\fP
+.fi
+.sp 0.5
+.IP "is converted by text2troff into:"
+.sp 0.6
+.nf
+\fCAfter this main text, a code-clock starts:
+\&.DS I 3
+\&.CW
+   some code text
+      some more indented code text
+code text less indented than first line
+\&.DE
+Main text continues here ...\fP
+.fi
+.sp 0.5
+.LP
+If option \f3-b\fP is given,
+a \f3\f8\\f6\f1 request for Courier fond is inserted instead of the \f3\f8.CW\f1 macro,
+for better representation in an HTML browser.
+.LP
+text2troff breaks up code block lines
+that exceed the applicable text column margins into shorter units
+as to fit these margins as good as possible.
+The resulting line lengths depend on whether or not any of the options \f3-d\fP , \f3-m\fP and/or
+\f3-c\fP have been given.
+If option \f3-b\fP is given though, code lines are not broken. 
+.
+.
+.LP
+groff_ms will print each code block in courier monospace font at an indentation level of 3
+characters with respect to the left margin of the previous text.
+.
+.
+.PP
+\f3Tables representation\f1
+.LP
+text2troff calls the separate program text2troff_table(1) to convert series of tabulated lines
+into tables, by inserting a number of macros and requests.
+The definition for a table is:
+two (2) or more subsequent lines each containing at least three (3) 'table cells' delimited by \f2tab\fP characters.
+.LP
+Per line and except for the table header,
+each individual table cell as delimited by adjacent \f2tab\fP(s) is:
+.IP -
+prefixed by \f3\f8T{\f1 and a \f2newline\fP character, and
+.IP -
+postfixed by a \f2newline\fP character and \f3\f8T}\f1
+.LP
+Any uninterrupted series of adjacent \f2tab\fPs is interpreted as \f3one\fP delimiter
+between neighboring cells, and is reduced to one \f2tab\fP.
+.IP "For example, the original text:"
+.sp 0.6
+.nf
+\fCAfter this line of main text, next lines represent a table:
+first cell	\f2 tab \fP	second cell: long text 	\f2 tab \fP  third cell
+fourth cell	\f2 tab \fP	fifth cell    \f2 tab \fP    	\f2 tab \fP  sixth cell
+Here the main text continues after the table ...\f1
+.fi
+.sp 0.5
+.IP "is converted by text2troff the following way:"
+.sp 0.6
+.nf
+\fCAfter this line of main text, next lines represent a table:
+\&.LP                  	\f1Macro `paragraph starts'\fP
+\&.nr table_nr +1      	\f1Number register `table_nr' is incremented by 1\fP
+\&.ps -\\n[ps_decr]    	\f1Point size minus decrement value being 20% of point size\fP
+\&.TS H                	\f1Request `table with header starts'\fP
+\&Tabel \\n[table_nr]  	\f1Header text and incremented number register `table_nr'\f2
+\&table_type\fC, allbox;   	\f1Requests `\f2table_type\fP' and `box around every table cell'\fC
+\&c s s                	\f1Header cell centered (c), spans (s) each other column\fP 
+\&l l l .              	\f1Each cell of next rows left (l) alligned \fP
+\&T{
+\&first cell           	\f1First row of table cells\fC
+\&T}\f2 tab \fPT{
+\&second cell: long text
+\&T}\f2 tab \fPT{
+\&third cell
+\&T}
+\&T{
+\&fourth cell          	\f1Second row of table cells\fP
+\&T}\f2 tab \fPT{
+\&fifth cell
+\&T}\f2 tab \fPT{
+\&sixth cell
+\&T}
+\&.TE                  	\f1Request `table ends'\fP
+\&.LP                  	\f1ms macro `paragraph starts'\fP
+\fCHere the main text continues after the table ...\fP
+.fi
+.LP
+The \f2table_type\fP can be:
+.IP "\fCcenter\fP"
+In this default case, groff_ms will center the table between the text margins, at a width no more 
+than strictly required by table contents;
+.br
+.IP "\fCexpand\fP"
+if option \f3-e\fP is given, or if option \f3-s\fP is given and table exceeds text margins,
+groff_ms will expand the table to full width between the text margins.
+.LP
+if option \f3-s\fP is given, invisible break characters \f3\f8\\:\f1 are inserted in the table cell
+text after every \f2n\fP characters \(en with \f2n\fP depending on on table width,
+chosen number of columns and character type and size \(en as to have groff_ms break the lines and 
+`squeeze' the table between text margins.
+.
+.
+.sp
+\f3Treatment of footnotes and marking points\f1
+.LP
+Footnote marking strings of one or more \fC*\fP followed by \fC)\fP are replaced by a
+\f3\f8\\**\f1 escape sequence.
+.br
+Footnote prefix strings of one or more \fC*\fP between \fC(\fP  \fC)\fP are removed.
+.br
+Footnote marking strings appearing within a footnoot or code-block are however left unchanged
+and literally copied to standard output.
+The same applies for a footnote prefix string within a table or code-block.
+.LP
+At each marking point found, text2troff moves the next footnote block to a line as close as 
+possible under the marking point, in the same order of appearance.
+.LP
+On top of the footnote block, a \f3\f8.FS\f1 (`footnote start') ms macro is inserted.
+Underneath the footnote block a \f3\f8.FE\f1 (`footnote end') ms macro is inserted.
+.IP "For example, the original text:"
+.sp 0.6
+.nf
+\fCNext marking point *) in the main text refers to a footnote,
+(*) First footnote goes here
+.sp
+next marking points **) and ***) refer to footnotes as well,
+as the main text continues here
+(**)  Here is the second footnote
+(***) Followed by the third one
+.sp
+and continues further here ...\fP
+.fi
+.sp 0.5
+.IP "is converted by text2troff into:"
+.sp 0.6
+.nf
+\fCNext marking point\\** in the main text refers to a footnote,
+\&.FS
+First footnote goes here
+\&.FE
+next marking points\\** and\\** refer to footnotes as well,
+\&.FS
+Here is the second footnote
+\&.FE
+\&.FS
+Followed by the third one
+\&.FE
+as the main text continues here 
+and continues further here ...\fP
+.fi
+.LP
+groff_ms will pair each footnote to a marking point appearing in the same order,
+by an automatically incremented superscript indentifier number.
+It will attempt to place each footnote at the bottom of the page that contains its associated
+marking point, or otherwise of the closest next page where it fits,
+keeping order of appearance intact.
+In case of more footnotes than marking points,
+the surplus amount of final footnoots is omitted by groff_ms.
+In the contrary case, empty footnotes are created near the surplus final marking points.
+.
+.
+.SH COMPATIBILITY
+.PP
+This program has been tested to run on both GNU/Linux (Ubuntu 22.04, Tiny Core Linux 10, Alpine Linux 3.12 
+within iSH app on iOS smartphone), as well as on MacOS X.
+In order to convert series of tabulated lines into tables, text2troff calls the separate program 
+text2troff_table(1), which as a consequence must be installed as well. text2troff_table can also be 
+called stand-alone for tables exclusively.
+.
+.
+.
+.SH BUGS
+The program doesn't support the code-blocks markers \fC[code]\fP and \fC[/code]\fP to appear as
+\f2literal code text themselves\f1 within code-blocks.
+.br
+Option \fB-B\fP to remove any `solitary' bullets is not fully tested yet.
+.br
+Interpetation of apostrophs isn't flawless and may result into an opening quote depending on placement.
+.br
+Page numbers and first footnote number don't adopt the general text color setting and thus remain default.
+.br
+Speed could be further improved.
+.
+.
+.SH AUTHOR
+Written by Rob Toscani (rob_toscani@yahoo.com)
+.
+.
+.
+.SH REPORTING BUGS
+Please report any bugs to the author by e-mail or via https://github.com/jazzfan2/text2troff/issues

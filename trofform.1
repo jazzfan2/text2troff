@@ -1,1 +1,109 @@
-/home/rob/scripts/manpages/trofform.1
+./" Manpage for your_function
+.TH TROFFORM 1 "27 December 2023" "0.0"
+.
+.
+.
+.SH NAME
+trofform \(en activates a chosen TROFF document format and deactivates any alternate document formats.
+.
+.
+.
+.SH SYNOPSIS
+trofform [\fIoptions\fP] [\fIinput-file\fP]
+.
+.
+.
+.SH DESCRIPTION
+trofform is a bash script that activates a chosen document format (including ancient AT&T variants) within a TROFF text
+and deactivates any alternate document formats.
+It does so by reducing the number of dots prefixed to the ms macro belonging to the chosen format to one (1),
+and by prefixing two (2) dots to all other document formats ms macros.
+Unaffected text lines are passed on unchanged, and the result is sent to standard output.
+.LP
+The output can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
+to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
+As an alternate to processing a text-file, trofform can also read (text) input from a pipe.
+.LP
+Prerequisite for evoking any of the ancient/authentic AT&T document formats is the presence on the system of the original AT&T `tmac.s' file
+with special macros.
+This special `tmac.s' macro-file is in the public domain,
+can be found on the web,
+and should preferrably be renamed differently as to avoid collisions with the natively installed ms-macro files.
+In order to process the output correctly,
+groff must be given option \fB-M\fP with the path to the directory where the AT&T macro-file resides.
+.LP
+trofform can be called both interactively (by options \fB-I\fP and \fB-h\fP) and non-interactively (by specifying no or any of the other options).
+.
+.
+.
+.SH OPTIONS
+trofform takes the following options:
+.IP "\fB-h\fP"
+Print `usage' text for help.
+.IP "\fB-R\fP"
+Activate \f3\f8.RP\f1 macro for \f2Released Paper\fP,
+and deactivate any alternate document representation macros.
+.IP "\fB-T\fP"
+Activate \f3\f8.TR\f1 macro for \f2Computing Science Technical Report\fP (AT&T),
+and deactivate any alternate document representation macros.
+.IP "\fB-i\fP"
+Activate \f3\f8.IM\f1 macro for \f2Internal Memorandum\fP (AT&T),
+and deactivate any alternate document representation macros.
+.IP "\fB-t\fP"
+Activate \f3\f8.TM\f1 and \f3\f8.CS\f1 macros for \f2Technical Memorandum\fP (AT&T) and related cover sheet,
+and deactivate any alternate document representation macros.
+.IP "\fB-f\fP"
+Activate \f3\f8.MF\f1 macro for \f2Memorandum for File\fP (AT&T),
+and deactivate any alternate document representation macros.
+.IP "\fB-r\fP"
+Activate \f3\f8.MR\f1 macro for \f2Memorandum for Record\fP (AT&T),
+and deactivate any alternate document representation macros.
+.IP "\fB-e\fP"
+Activate \f3\f8.EG\f1 macro for \f2Engineer's Notes\fP (AT&T),
+and deactivate any alternate document representation macros.
+.IP "\fB-I\fP"
+Interactive mode.
+User is presented with following menu for choosing the preferred document format:
+.nf
+.IP
+\fCPlease choose document format in which to present the output:
+.sp
+1. Non Released Paper  (without cover sheet)
+2. RP - Released Paper (with cover sheet)
+3. TR - Computing Science Technical Report (AT&T)
+4. IM - Internal Memorandum (AT&T)
+5. TM - Technical Memorandum (AT&T)
+6. MF - Memorandum for File (AT&T)
+7. MR - Memorandum for Record (AT&T)
+8. EG - Engineer's Notes (AT&T)
+9. Close trofform\fP
+.fi
+.sp
+trofform subsequently prompts for any further command(s) to process the output by,
+unless 9. has been chosen to close the program.
+Pipe constructs are allowed without argument.
+.LP
+If no option is given, all document format ms macros are deactivated.
+This results in the document being formatted as a 'Non Released Paper' without cover sheet.
+.
+.
+.
+.SH COMPATIBILITY
+.PP
+This program has been tested to run on both GNU/Linux (Ubuntu 22.04, Tiny Core Linux 10, Alpine Linux 3.12 
+within iSH app on iOS smartphone), as well as on MacOS X.
+In order to be able to evoke the authentic AT&T documents while processing the TROFF output with groff_ms,
+the original AT&T `tmac.s' macro-file needs to be installed and be referred to.
+.
+.
+.SH BUGS
+No known bugs.
+.
+.
+.SH AUTHOR
+Written by Rob Toscani (rob_toscani@yahoo.com)
+.
+.
+.
+.SH REPORTING BUGS
+Please report any bugs to the author by e-mail or via https://github.com/jazzfan2/text2troff/issues
