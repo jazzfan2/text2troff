@@ -32,7 +32,7 @@
 #
 ######################################################################################
 
-set -o noclobber	# Prevent files to be overwritten accidentally by redirection of standard output
+set -o noclobber    # Prevent files to be accidentally overwritten by redirection of standard output
 
 
 options(){
@@ -59,7 +59,7 @@ options(){
 
 
 helptext()
-# Text printed if -h option (help) or a not existing option has been given:
+# Text printed if -h option (help) or a non-existing option has been given:
 {
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)

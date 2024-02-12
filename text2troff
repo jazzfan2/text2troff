@@ -4,11 +4,14 @@
 # Date  : 12-01-2024
 # Description:
 #
-# text2troff is a bash script that uses a combination of awk and sed filters to convert a flat text-file into
-# TROFF text format, by inserting TROFF request and ‘ms’ macro commands. The result is sent to standard
-# output, and can be processed further with available ‘troff’ tools with ‘ms’ macro package, preferrably GNU
-# groff_ms(7), to produce typeset PostScript-, PDF-, HTML- or terminal (‘nroff’) output. As an alternative
-# to processing a text-file, text2troff can also read (text) input from a pipe.
+# text2troff is a bash script that uses a combination of awk and sed filters to convert
+# a flat text-file into TROFF text format, by inserting TROFF request and ‘ms’ macro commands.
+# The result is sent to standard output, and can be processed further with available ‘troff’
+# tools with ‘ms’ macro package, preferrably GNU groff_ms(7), to produce typeset PostScript-,
+# PDF-, HTML- or terminal (‘nroff’) output. As an alternative to processing a text-file, 
+# text2troff can also read (text) input from a pipe.
+#
+# (Comment texts are still partly in Dutch - will be translated into English in due course!)
 #
 ######################################################################################
 #
@@ -29,21 +32,21 @@
 #
 ######################################################################################
 
-set -o noclobber		# Voorkomen dat bestanden per ongeluk worden overschreven door omleiding van standaard output
+set -o noclobber    # Prevent files to be accidentally overwritten by redirection of standard output
 
-####################################### HIER VOLGEN DE FUNCTIES #####################################
+####################################### FUNCTIES START HERE #####################################
 
 options(){
-# Opties opgeven:
+# Specify options:
     while getopts "a:BbcDdmf:hik:nNpesS:tuz:" OPTION; do
         case $OPTION in
-            a) if   [[ $OPTARG == g ]]; then escape="gnu"         # Optie als utf-8 niet beschikbaar is
-               elif [[ $OPTARG == a ]]; then escape="at&t"        # idem, alternatief  
-               elif [[ $OPTARG == b ]]; then escape="berkeley"    # idem, alternatief
+            a) if   [[ $OPTARG == g ]]; then escape="gnu"         # Option if utf-8 is not available
+               elif [[ $OPTARG == a ]]; then escape="at&t"        # idem, alternative  
+               elif [[ $OPTARG == b ]]; then escape="berkeley"    # idem, alternative
                else                          escape="gnu"         # Default
                fi
                ;;
-            B) clean_bullets=1   # LET OP: DEZE FUNCTIE IS NOG NIET VOLLEDIG GETEST !
+            B) clean_bullets=1   # N.B.: THIS FUNCTION IS NOT FULLY TESTED YET !
                ;;
             b) browser=1
                ;;
@@ -119,36 +122,36 @@ options(){
 
 
 helptext()
-# Tekst die wordt geprint nadat de -h optie (help) of een niet bestaande optie is meegegeven:
+# # Text printed if -h option (help) or a non-existing option has been given:
 {
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)
     done << EOF
 Usage: text2troff29.sh [-aBbcDdmfhiknNpesStuz] TEXTFILE
 
--h   Help (deze uitvoer)
--B   Opruimen van "solitaire" bullets (nog niet getest)
--b   Output geoptimaliseerd voor 'browser'
--c   Output geoptimaliseerd voor 'console' (terminal)
--D   Documentdatum gelijk aan datum van ontstaan van TROFF-file
--d   Dubbele-kolom (2) opmaak
--m   Multi-kolom (>=3) opmaak
--i   Inspringingen aan het begin van elke alinea
+-h   Help (this output)
+-B   Clean up "solitary" bullets (not tested yet)
+-b   Optimize output for 'browser' (HTML)
+-c   Optimize output for 'console' (terminal)
+-D   Make document date equal to orginating date of TROFF-file
+-d   Double column (2) layout
+-m   Multi column (>=3) layout
+-i   Have each paragraph start with an indented line
 
--N   Alle hoofdstuktitels oplopend nummeren
--n   Na elke newline in de brontekst op de volgende regel beginnen
--p   Na elke punt a/h eind van een zin op de volgende regel beginnen
--e   Tabellen uitrekken ('expand') tot aan de tekst(kolom)marges 
--s   Tabellen binnen tekstmarges persen ('squeeze') indien te breed
--t   Inhoudsopgave automatisch genereren en toevoegen
--u   Hoofdstuktitels in hoofdletters laten weergeven
+-N   Prefix all chapter headers by incrementing numbers
+-n   Have typeset text start on new line if source text does 
+-p   Have typeset text start on new line after end-of-sentence period
+-e   Stretch tables ('expand') to text margins  
+-s   Force tables within text margins ("squeeze") if too wide
+-t   Automatically generate and include a Table of Contents
+-u   Convert chapter header text from lower case to upper case
 -a TYPE 
-|    Accenten en speciale karakters verwerken met escape-sequences: 
+|    Convert characters with accent marks into escape-sequences: 
 |    TYPE  = g   GNU groff_char(7)
 |            a   AT&T ms legacy
 |            b   Berkeley ms legacy
 -f FONT
-|    Karakter-font in plaats van default Times:
+|    Character-font instead of default Times:
 |    FONT  = H   Helvetica
 |            h   Helvetica Narrow
 |            a   Avant Garde
@@ -157,21 +160,21 @@ Usage: text2troff29.sh [-aBbcDdmfhiknNpesStuz] TEXTFILE
 |            n   New Century Schoolbook
 |            p   Palatino
 -S STYLE
-|    Karakter-style in plaats van default Regular: 
+|    Character-style instead of default Regular: 
 |    STYLE = i   Italic
 |            b   Bolt
 |            bi  Bolt Italic
 -z SIZE
-|    Karaktergrootte in pts
+|    Character size in pts
 -k COLOR 
-|    Tekstkleur in plaats van default:
+|    Text color instead of default:
 |    COLOR = a   Aquamarine 
-|            b   Blauw
-|            gn  Groen
-|            gr  Grijs
+|            b   Blue
+|            gn  Green
+|            gr  Grey
 |            m   Magenta
-|            o   Olijf
-|            r   Rood
+|            o   Olive
+|            r   Red
 EOF
 }
 
@@ -978,7 +981,7 @@ postpostprocess()
 # (=> LET OP: functie werkt alleen als code-regels *NIET* zijn voorzien van "code-markers" (x><x).)
 
 
-################################# HIER BEGINT HET HOOFDPROGRAMMA #####################################
+################################# MAIN PROGRAM STARTS HERE #####################################
 
 
 trap "opruimen; exit" SIGINT
