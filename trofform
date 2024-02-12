@@ -2,10 +2,8 @@
 # Name  : trofform
 # Author: R.J.Toscani
 # Date  : 23 december 2023
-# Decription:
-#
-# trofform is a bash script that activates a chosen document format (including ancient 
-# AT&T variants) within a TROFF text and deactivates any alternate document formats.
+# Decription: 'trofform' is a bash script that activates a chosen document format (including
+# ancient AT&T variants) within a TROFF text and deactivates any alternate document formats.
 # It does so by reducing the number of dots prefixed to the ms macro belonging to the 
 # chosen format to one (1), and by prefixing two (2) dots to all other document formats
 # ms macros. Unaffected text lines are passed on unchanged, and the result is sent to
