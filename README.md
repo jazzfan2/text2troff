@@ -74,7 +74,7 @@ groff must be given option -M with the path to the directory where the AT&T macr
 trofform can be called both interactively (by options -I and -h) and non-interactively (by specifying no or any of the other options).
 
 # How to use text2troff, text2troff_table and trofform:
-See the man-pages included in this repository full description.
+See the man-pages included in this repository for full description and options.
 
 # Author:
 Written by Rob Toscani (rob_toscani@yahoo.com).
