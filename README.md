@@ -1,13 +1,9 @@
-# Project’s Title
+# Name: text2troff
 
-## text2troff
-text2troff - converts a flat text-file to TROFF text format by inserting requests and 'ms' macro commands.
-
-## text2troff_table
-text2troff_table - converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests.
-
-## trofform
-trofform - activates a chosen TROFF document format and deactivates any alternate document formats.
+text2troff is the major part of a suite of programs consisting of:
+- text2troff - converts a flat text-file to TROFF text format by inserting requests and 'ms' macro commands.
+- text2troff_table - converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests. Is called by text2troff but can also be used stand-alone.
+- trofform - activates a chosen TROFF document format and deactivates any alternate document formats. Can process output from text2troff.
 
 # Description:
 
