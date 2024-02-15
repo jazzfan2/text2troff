@@ -1,8 +1,10 @@
 #!/bin/bash
 # Name       : functions_troff
 # Author     : Rob Toscani
-# Date       : 29 juni 2019 - Aangepast aan de Ubuntu-installatie op de Dell PC
-# Description: This script is a collection of groff() functions that can be called from other shell programs. 
+# Date       : 29 juni 2019
+# Description: This script is a collection of groff() functions that can be called from other shell programs.
+#
+# (Comment texts are still partly in Dutch - will be translated into English in due course!) 
 #
 ##################################################################################################
 #
