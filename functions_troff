@@ -1,0 +1,348 @@
+#!/bin/bash
+# Name       : functions_troff
+# Author     : Rob Toscani
+# Date       : 29 juni 2019 - Aangepast aan de Ubuntu-installatie op de Dell PC
+# Description: This script is a collection of groff() functions that can be called from other shell programs. 
+#
+##################################################################################################
+
+  macros="/$HOME/Documenten/Ubuntu-Linux/troff/macros"
+
+if [[ -d /tmp/ramdisk/ ]]; then                          # tmpfs
+    tmpfiledir="/tmp/ramdisk"
+elif [[ -d /dev/shm/ ]]; then
+    tmpfiledir="/dev/shm"
+else
+    tmpfiledir="."
+fi
+
+########################################################################################################
+# Function die een troff-document met ms-macros (of meerdere delen aaneen) wegschrijft naar .pdf:
+#
+ptrofms()
+{
+    groff -K utf8 -petR -ms -Tps "$@" 2>/dev/null | ps2pdf - out.pdf 
+}
+# Het postscript-formaat wordt gebruikt als output van groff om afbeeldingen in de tekst te ondersteunen.
+#
+########################################################################################################
+# Versie van ptrofms() die de Table of Contents (TOC) - indien aanwezig - vooraan plaatst ipv achteraan:
+#
+ptrofms2()
+{
+    preconv -e utf8 "$@" | pdfroff -petR -mspdf - 2>/dev/null >| out.pdf 
+}
+#
+########################################################################################################
+# Function die een troff-document met me-macros (of meerdere delen aaneen) wegschrijft naar .pdf:
+#
+ptrofme()
+{
+    groff -K utf8 -petR -me -Tps "$@" 2>/dev/null | ps2pdf - out.pdf 
+}
+#
+########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros) in .pdf omzet:
+#
+ptrofatt()
+{
+    html_code_courier "$@" |
+    activate_date - |
+    groff -K utf8 -petR -M "$macros" -mos -Tps - 2>/dev/null | ps2pdf - out.pdf
+}
+#
+########################################################################################################
+# Function die een troff-document met of zonder ms-macros (of meerdere delen aaneen) wegschrijft naar .html:
+#
+htrofms()
+{
+    preconv -e utf8 "$@" | groff -petR -ms -Thtml 2>/dev/null >| out.html 
+}
+#
+########################################################################################################
+# Function die een troff-document met me-macros (of meerdere delen aaneen) wegschrijft naar .html:
+#
+htrofme()
+{
+    preconv -e utf8 "$@" | groff -petR -me -Thtml 2>/dev/null >| out.html 
+}
+#
+########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros) in .html omzet:
+#
+htrofatt()
+{
+    html_code_courier "$@" |
+    activate_date - |
+    preconv -e utf8 - | groff -petR -M "$macros" -mos -Thtml 2>/dev/null >| out.html
+}
+#
+########################################################################################################
+# Function die een troff-document met ms-macros (of meerdere delen aaneen) in opmaak op het tty scherm weergeeft:
+#
+nrofms()
+{
+    width=$((`tput cols` - 10))             # Adjust text and title width to actual terminal width
+    if grep -q "UTF-8" <<< "$LANG"; then    # Check if terminal language (locale) supports UTF-4
+        groff -K utf8 -petR -ms -Tutf8  -rLL="$width"n -rLT="$width"n "$@" 2>/dev/null | less -R
+    else                                    # else use ascii
+        groff -K utf8 -petR -ms -Tascii -rLL="$width"n -rLT="$width"n "$@" 2>/dev/null | less -R
+    fi
+}
+#
+########################################################################################################
+# Function die een troff-document met me-macros (of meerdere delen aaneen) in opmaak op het tty scherm weergeeft:
+#
+nrofme()
+{
+    if grep -q "UTF-8" <<< "$LANG"; then    # Check if terminal language (locale) supports UTF-4
+        groff -K utf8 -petR -me -Tutf8 "$@" 2>/dev/null | less -R
+    else
+	    groff -K utf8 -petR -me -Tascii "$@" 2>/dev/null | less -R
+    fi
+}
+#
+########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros, gekopieerd naar 
+# eigen lokale macroset "mos") in opmaak op het tty scherm weergeeft:
+#
+nrofatt()
+{
+    activate_date "$@" |
+    if grep -q "UTF-8" <<< "$LANG"; then    # Check if terminal language (locale) supports UTF-4
+        groff -K utf8 -petR -M "$macros" -mos -Tutf8 - 2>/dev/null | less -R
+    else
+        groff -K utf8 -petR -M "$macros" -mos -Tascii - 2>/dev/null | less -R
+    fi
+}
+#
+#########################################################################################################
+# Function die een troff-document met ms-macros (of meerdere delen aaneen) in opmaak in pdf viewer opent:
+#
+trofms()
+{
+    groff -K utf8 -petR -ms -Tps "$@" 2>/dev/null | ps2pdf - | zathura -
+
+}
+#
+#########################################################################################################
+# Versie van trofms() die de Table of Contents (TOC) - indien aanwezig - vooraan plaatst ipv achteraan:
+#
+trofms2()
+{
+    preconv -e utf8 "$@" | pdfroff -petR -mspdf - 2>/dev/null | zathura - 
+}
+#
+########################################################################################################
+# Function die een troff-document met me-macros (of meerdere delen aaneen) in opmaak in pdf viewer opent:
+#
+trofme()
+{
+    groff -K utf8 -petR -me -Tps "$@" 2>/dev/null | ps2pdf - | zathura -
+}
+
+########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros, gekopieerd naar 
+# eigen lokale macroset "mos") in pdf viewer opent:
+#
+trofatt()
+{
+    html_code_courier "$@" |
+    activate_date - |
+    groff -K utf8 -petR -M "$macros" -mos -Tps - 2>/dev/null | ps2pdf - | zathura -
+}
+# Het postscript-formaat wordt gebruikt als output van groff om afbeeldingen in de tekst te ondersteunen
+#
+#########################################################################################################
+# Function die een troff-document met ms macros (of meerdere delen aaneen) in een elinks browser viewt:
+#
+erofms()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag in RAM en alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"/
+    preconv -e utf8 $name | groff -petR -ms -Thtml 2>/dev/null >| $name.html # Geeft beter resultaat dan met pipe.
+    elinks $name.html 2>/dev/null
+    cd "$path"
+
+}
+#
+#########################################################################################################
+# Function die een troff-document met me macros (of meerdere delen aaneen) in een elinks browser viewt:
+#
+erofme()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag in RAM en alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"/
+    preconv -e utf8 $name | groff -petR -me -Thtml 2>/dev/null >| $name.html # Geeft beter resultaat dan met pipe.
+    elinks $name.html 2>/dev/null
+    cd "$path"
+}
+#
+########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros) in elinks viewt:
+#
+erofatt()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag in RAM en alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"/
+    activate_date $name |
+    preconv -e utf8 - | groff -petR -M "$macros" -mos -Thtml 2>/dev/null >| $name.html
+    elinks $name.html 2>/dev/null
+    cd "$path"
+}
+#
+#########################################################################################################
+# Function die een troff-document met ms macros (of meerdere delen aaneen) in een lynx browser viewt:
+#
+lrofms()
+{
+    name=$RANDOM
+    preconv -e utf8 "$@" | groff -petR -ms -Thtml 2>/dev/null >| "$tmpfiledir"/$name.html
+    lynx "$tmpfiledir"/$name.html
+    \rm grohtml*.png
+}
+#
+#########################################################################################################
+# Function die een troff-document met me macros (of meerdere delen aaneen) in een lynx browser viewt:
+#
+lrofme()
+{
+    name=$RANDOM
+    preconv -e utf8 "$@" | groff -petR -me -Thtml 2>/dev/null >| "$tmpfiledir"/$name.html
+    lynx "$tmpfiledir"/$name.html
+    \rm grohtml*.png
+}
+#
+#########################################################################################################
+# Function die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros) in lynx viewt:
+#
+lrofatt()
+{
+    name=$RANDOM
+    html_code_courier "$@" |
+    activate_date - |
+    preconv -e utf8 - | groff -petR -M "$macros" -mos -Thtml 2>/dev/null >| "$tmpfiledir"/$name.html
+    lynx "$tmpfiledir"/$name.html
+    \rm grohtml*.png
+}
+#########################################################################################################
+# Function die een troff-document met ms macros (of meerdere delen aaneen) in een firefox browser viewt:
+frofms()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=troff2html_$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"
+    preconv -e utf8 $name | groff -petR -ms -Thtml 2>/dev/null >| $name.html  # Geeft beter resultaat dan met pipe. 
+    /usr/bin/firefox $name.html 2>/dev/null
+    cd "$path"
+}
+#
+#########################################################################################################
+# Function die een troff-document met me macros (of meerdere delen aaneen) in een firefox browser viewt:
+frofme()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=troff2html_$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"
+    preconv -e utf8 $name | groff -petR -me -Thtml 2>/dev/null >| $name.html # Geeft beter resultaat dan met pipe.
+    /usr/bin/firefox $name.html 2>/dev/null 
+    cd "$path"
+}
+#
+#########################################################################################################
+# Function die die een authentiek AT&T Bell Labs troff-document (met UNIX v7 -ms macros) in een firefox browser viewt:
+frofatt()
+{
+    path="`pwd`"
+    trap "cd $path; exit" SIGINT
+    name=troff2html_$RANDOM
+    cat "$@" > "$tmpfiledir"/$name        # Opslag alle tijdelijke .png files ook alleen daar.
+    cd "$tmpfiledir"
+    html_code_courier $name |
+    activate_date - |
+    preconv -e utf8 - | groff -petR -M "$macros" -mos -Thtml 2>/dev/null >| $name.html
+    /usr/bin/firefox $name.html 2>/dev/null
+    cd "$path"
+}
+#
+#########################################################################################################
+# Function die de fixed-date macro (.ND) in een troff-document activeert en het resultaat naar stdout stuurt:
+#
+activate_date()
+{
+    cat "$@" | sed -E "s/^(\.{2,}|\.*\\\\\"\.)(ND)/\.\2/g"
+}
+
+#########################################################################################################
+# Function die de .CW macro's omzet naar \f6 requests en vóór de .DE macro een \f1 request plaatst.
+# Het resultaat wordt naar stdout gestuurd.
+#
+html_code_courier()
+{
+    awk 'BEGIN  { codeblock = 0 }
+    /^\.DS/     { codeblock = 1 }
+    /^\.DE$/    { codeblock = 0 }
+    {
+        sub(/^\.CW$/, "\\f6")
+        if (/^\.DE$/)
+           print "\\f1"
+        print
+    }' "$@"
+}
+
+#########################################################################################################
+# Function die de Table-of-Content (TC) uit een troff-document verwijdert en het restant naar stdout stuurt:
+#
+roff_notc()
+{
+    cat "$@" | sed -e 's/\.TC//g' -e '/^\.XS/,/^\.XE/{/^\.XS/!{/^\.XE/!d}}' -e  's/\.XS//g' -e 's/\.XE//g'
+}
+# Te gebruiken voorafgaand aan een groff(fer)-functie/-alias die een troff naar .html-formaat omzet.
+# Reden van deze functie is dat de troff -ms Table-of-Content conflicteert met de html Table-of-Content.
+# Voor uitleg tweede -e zie https://stackoverflow.com/questions/6287755/using-sed-to-delete-all-lines-between-two-matching-patterns
+#
+########################################################################################################
+# Function die de commentaarregels uit een troff-document verwijdert en het restant naar stdout stuurt:
+#
+roff_nocom()
+{
+    cat "$@" | sed -E 's/(\t| )*\.?\\(\"|#).*//g' | grep -v ^$
+}
+#
+########################################################################################################
+# Inlezen van een bibliografische References list selectie vanuit de AT&T UNIXv7 reference master list in een (als argument[-en] op te geven) TROFF document:
+#
+attref()
+{
+    refer -ep "$macros"/Rv7man 2>/dev/null "$@"
+}
+#
+########################################################################################################
+# Converteer een of meerdere .jpg of .png afbeeldingen naar klein formaat .eps file(s) die in een troff document kan/kunnen worden geplaatst met PSPIC (bron: http://zyliu2005.blogspot.com/2010/03/linux-how-to-reduce-eps-file-size.html):
+#
+smalleps()
+{
+    while [[ $# != 0 ]]; do
+        convert "$1" "$tmpfiledir"/"$1".pdf
+        pdftops -eps "$tmpfiledir"/"$1".pdf "$1"_.eps
+        \rm "$tmpfiledir"/"$1".pdf   
+        shift 1
+    done
+}
+#
+########################################################################################################
+
+
