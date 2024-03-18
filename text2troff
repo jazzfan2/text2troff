@@ -32,7 +32,7 @@
 
 set -o noclobber    # Prevent files to be accidentally overwritten by redirection of standard output
 
-####################################### FUNCTIES START HERE #####################################
+####################################### FUNCTIONS START HERE #####################################
 
 options(){
 # Specify options:
@@ -120,7 +120,7 @@ options(){
 
 
 helptext()
-# # Text printed if -h option (help) or a non-existing option has been given:
+# Text printed if -h option (help) or a non-existing option has been given:
 {
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)
@@ -594,11 +594,11 @@ format_tables()
 # De gewenste tabelformatering toepassen:
 {
     option=""
-    [[ $tabletype    == "expand" ]] && option="$option""e"   # Roep text2troff_tabel10.sh aan met optie -e
-    [[ $tablesqueeze == 1        ]] && option="$option""s"   # Roep text2troff_tabel10.sh aan met optie -s
+    [[ $tabletype    == "expand" ]] && option="$option""e"   # Roep text2troff_table.sh aan met optie -e
+    [[ $tablesqueeze == 1        ]] && option="$option""s"   # Roep text2troff_table.sh aan met optie -s
 
-    [[ $option == "" ]] && ./text2troff_table            "$1" $columnwidth  ||
-                           ./text2troff_table -"$option" "$1" $columnwidth
+    [[ $option == "" ]] && text2troff_table            "$1" $columnwidth  ||
+                           text2troff_table -"$option" "$1" $columnwidth
 }
 
 
