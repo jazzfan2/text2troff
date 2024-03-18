@@ -1158,7 +1158,7 @@ elif [[ $colnum == 2 ]]; then
     if (( console )); then
         (( columnwidth = ( (textwidth-10) - (7*textwidth/100)) / 2 )) # Min marge min gutter = 0,07*tput-cols, en door 2
     else
-        (( columnwidth = ( textwidth - (40/$size)) / 2 ))             # Min gutter als aantal karakters, en door 2
+        columnwidth=$(bc <<< "scale=0;($textwidth - (40/$size)) / 2") # Min gutter als aantal karakters, en door 2
     fi
 else
     columns=".MC "$columnwidth                                        # Dit is het aantal monospace-karakters in nroff
