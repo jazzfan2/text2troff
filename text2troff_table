@@ -293,7 +293,7 @@ BEGIN {
     }
     row = ""
     i = 1
-    while ($i){
+    while (length($i)){
         text = $i
         if (squeeze)
             gsub(regex, "&\\:", text)               # Voeg een \: break sequence in na elke "chunk" aan karakters.
