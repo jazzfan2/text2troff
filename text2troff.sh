@@ -594,11 +594,11 @@ format_tables()
 # De gewenste tabelformatering toepassen:
 {
     option=""
-    [[ $tabletype    == "expand" ]] && option="$option""e"   # Roep text2troff_table aan met optie -e
-    [[ $tablesqueeze == 1        ]] && option="$option""s"   # Roep text2troff_table aan met optie -s
+    [[ $tabletype    == "expand" ]] && option="$option""e"   # Roep text2troff_table.sh aan met optie -e
+    [[ $tablesqueeze == 1        ]] && option="$option""s"   # Roep text2troff_table.sh aan met optie -s
 
-    [[ $option == "" ]] && text2troff_table            "$1" $columnwidth  ||
-                           text2troff_table -"$option" "$1" $columnwidth
+    [[ $option == "" ]] && text2troff_table.sh            "$1" $columnwidth  ||
+                           text2troff_table.sh -"$option" "$1" $columnwidth
 }
 
 
