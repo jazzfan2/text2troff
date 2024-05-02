@@ -1,27 +1,27 @@
 #!/bin/bash
-# Name  : trofform
+# Name  : trofform.sh
 # Author: R.J.Toscani
 # Date  : 23 december 2023
-# Decription: 'trofform' is a bash script that activates a chosen document format (including
+# Decription: 'trofform.sh' is a bash script that activates a chosen document format (including
 # ancient AT&T variants) within a TROFF text and deactivates any alternate document formats.
 # It does so by reducing the number of dots prefixed to the ms macro belonging to the 
 # chosen format to one (1), and by prefixing two (2) dots to all other document formats
 # ms macros. Unaffected text lines are passed on unchanged, and the result is sent to
 # standard output. The output can be processed further with available ‘troff’ tools with
 # ‘ms’ macro package, preferrably GNU groff_ms(7), to produce typeset PostScript-, PDF-,
-# HTML- or terminal (‘nroff’) output. As an alternate to processing a text-file, trofform
+# HTML- or terminal (‘nroff’) output. As an alternate to processing a text-file, trofform.sh
 # can also read (text) input from a pipe.
 #
 ######################################################################################
 #
 # Copyright (C) 2024 Rob Toscani <rob_toscani@yahoo.com>
 
-# trofform is free software: you can redistribute it and/or modify
+# trofform.sh is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# trofform is distributed in the hope that it will be useful,
+# trofform.sh is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -63,7 +63,7 @@ helptext()
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)
     done << EOF
-Usage: trofform3.sh [-efhiIrRtT] TROFF-FILE
+Usage: trofform.sh [-efhiIrRtT] TROFF-FILE
 
 -h   Help (this output)
 -R   RP - Released Paper (with cover sheet)
@@ -93,7 +93,7 @@ Please choose document format in which to present the output:
 6. MF - Memorandum for File (AT&T)
 7. MR - Memorandum for Record (AT&T)
 8. EG - Engineer's Notes (AT&T)
-9. Close trofform
+9. Close trofform.sh
 
 EOF
         read -n 1 choice

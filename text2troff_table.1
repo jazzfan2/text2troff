@@ -4,23 +4,23 @@
 .
 .
 .SH NAME
-text2troff_table \(en converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests. 
+text2troff_table.sh \(en converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests. 
 .
 .
 .
 .SH SYNOPSIS
-text2troff_table [\fIoptions\fP] [\fIinput-file\fP]
+text2troff_table.sh [\fIoptions\fP] [\fIinput-file\fP]
 .
 .
 .
 .SH DESCRIPTION
-text2troff_table is a bash script that uses \f2awk\fP filtering to convert tabulated lines
+text2troff_table.sh is a bash script that uses \f2awk\fP filtering to convert tabulated lines
 in a flat text-file into TROFF formatted tables by inserting table requests and ms macros.
 All lines not interpreted as table lines are passed on unchanged.
 The result is sent to standard output,
 and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
-As an alternative to processing a text-file, text2troff_table can also read (text) input from a pipe.  
+As an alternative to processing a text-file, text2troff_table.sh can also read (text) input from a pipe.  
 .
 .
 .
@@ -42,7 +42,7 @@ never be part of the contents of a table cell.
 .br
 All text intended to be in a single table row shall be placed on the same text line.
 .SH OPTIONS
-text2troff_table takes the following options:
+text2troff_table.sh takes the following options:
 .IP "\f3-h\fP"
 Print `usage' text for help.
 .IP "\f3-e\fP"
@@ -56,7 +56,7 @@ text margins, by adding invisible break characters \: to the contained text.
 .
 .
 .SH "TEXT TRANSFORMATION TO TROFF FORMAT" 
-First, text2troff_table removes any amount of \f2tab\fPs at the beginning or end of each line,
+First, text2troff_table.sh removes any amount of \f2tab\fPs at the beginning or end of each line,
 and it replaces any contiguous series of \f2tab\fPs within a text line by just one \f2tab\fP.
 Not affected though are text lines within `displays',
 as marked by presence of ms macros \f3\f8.DS\f1 (`display starts') and \f3\f8.DE\f1
@@ -64,7 +64,7 @@ as marked by presence of ms macros \f3\f8.DS\f1 (`display starts') and \f3\f8.DE
 Also all ISO-8859 characters are converted to UTF-8,
 and \f2return\fP characters (\fC\\r\fP) are removed.
 .LP
-Next, text2troff_table treats any contiguous cluster of two (2) or more text lines as a table,
+Next, text2troff_table.sh treats any contiguous cluster of two (2) or more text lines as a table,
 if each contains at least two (2) non-adjacent \f2tab\fP characters.
 The table is terminated as soon as a line passes that doesn't meet above conditions.
 At any following cluster of lines that again complies, a next table starts.
@@ -78,7 +78,7 @@ which is automatically incremented during interpretation by groff_ms.
 Default font size within the tables is set at the default point size minus 20%.
 Latter value is defined by a second TROFF register variable.
 To set both variables,
-text2troff_table inserts the following two lines at the top of the input text:\f1
+text2troff_table.sh inserts the following two lines at the top of the input text:\f1
 .LP
 .TS
 lw(30) lw(40).
@@ -122,7 +122,7 @@ Here the main text continues after the table ...\f1
 .fi
 .sp 0.5
 .LP
-is converted by text2troff_table the following way:
+is converted by text2troff_table.sh the following way:
 .LP
 .IP
 .nf

@@ -1,14 +1,14 @@
 #!/bin/bash
-# Name  : text2troff_table
+# Name  : text2troff_table.sh
 # Author: R.J.Toscani
 # Date  : 26-10-2023
-# Description: 'text2troff_table' is a bash script that uses awk filtering to convert 
+# Description: 'text2troff_table.sh' is a bash script that uses awk filtering to convert 
 # tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests
 # and ms macros. All lines not interpreted as table lines are passed on unchanged. The result
 # is sent to standard output, and can be processed further with available 'troff' tools with
 # 'ms' macro package, preferrably GNU groff_ms(7), to produce typeset PostScript-, PDF-, 
 # HTML- or terminal ('nroff') output. As an alternative to processing a text-file, 
-# text2troff_table can also read (text) input from a pipe.
+# text2troff_table.sh can also read (text) input from a pipe.
 #
 # (Comment texts are still partly in Dutch - will be translated into English in due course!)
 #
@@ -16,12 +16,12 @@
 #
 # Copyright (C) 2024 Rob Toscani <rob_toscani@yahoo.com>
 
-# text2troff_table is free software: you can redistribute it and/or modify
+# text2troff_table,sh is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# text2troff_table is distributed in the hope that it will be useful,
+# text2troff_table.sh is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -42,7 +42,7 @@ helptext()
     done << EOF
 
 Usage:
-text2troff_table [-ehs] TEXTFILE
+text2troff_table.sh [-ehs] TEXTFILE
 
    -e     Stretch tables to full text column width ('expand')
    -s     Force tables within text column width("squeeze") if too wide

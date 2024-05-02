@@ -1,13 +1,13 @@
 #!/bin/bash
-# Name  : text2troff
+# Name  : text2troff.sh
 # Author: R.J.Toscani
 # Date  : 12-01-2024
-# Description: 'text2troff' is a bash script that uses a combination of awk and sed filters to
+# Description: 'text2troff.sh' is a bash script that uses a combination of awk and sed filters to
 # convert a flat text-file into TROFF text format, by inserting TROFF request and ‘ms’ macro
 # commands. The result is sent to standard output, and can be processed further with available
 # ‘troff’ tools with ‘ms’ macro package, preferrably GNU groff_ms(7), to produce typeset 
 # PostScript-, PDF-, HTML- or terminal (‘nroff’) output. As an alternative to processing a 
-# text-file, text2troff can also read (text) input from a pipe.
+# text-file, text2troff.sh can also read (text) input from a pipe.
 #
 # (Comment texts are still partly in Dutch - will be translated into English in due course!)
 #
@@ -15,12 +15,12 @@
 #
 # Copyright (C) 2024 Rob Toscani <rob_toscani@yahoo.com>
 #
-# text2troff is free software: you can redistribute it and/or modify
+# text2troff.sh is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# text2troff is distributed in the hope that it will be useful,
+# text2troff.sh is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -125,7 +125,7 @@ helptext()
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)
     done << EOF
-Usage: text2troff29.sh [-aBbcDdmfhiknNpesStuz] TEXTFILE
+Usage: text2troff.sh [-aBbcDdmfhiknNpesStuz] TEXTFILE
 
 -h   Help (this output)
 -B   Clean up "solitary" bullets (not tested yet)
@@ -1029,7 +1029,7 @@ touch $offsets
 
 
 # We beginnen met de toevoeging van wat authentieke AT&T macro's, uit te voeren via de alias "trofform(.sh)":
-# text2troff28.sh [opties] [tekstfile.txt] | trofform
+# text2troff.sh [opties] [tekstfile.txt] | trofform
 while read line; do
     echo "$line"
 done << EOF
