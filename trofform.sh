@@ -58,7 +58,7 @@ options(){
 
 
 helptext()
-# Text printed if -h option (help) or a non-existing option has been given:
+# Text printed if -h option (help) or a non-existent option has been given:
 {
     while read "line"; do
         echo "$line" >&2         # print to standard error (stderr)
