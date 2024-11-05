@@ -402,9 +402,9 @@ put_footnotes()
             print $0                                 # Print deze regel (dus voorafgaand aan de voetnoot zelf)
 
         }
-        while (notestack && ! /^x><x/ && ! /^x><><x /){   # Blijf voetnoten ophalen zolang de stack niet leeg is, en
-                                                          # niet in codeblok (^x><x) of tabel (^x><><x)
-            line = ".FS\n\\m["color"]"footnotes[i]".FE"   # Voorzie eerstvolgende voetnoottekst uit de array van macros (en kleur)
+        while (notestack && ! /^x><x/ && ! /^x><><x /){     # Blijf voetnoten ophalen zolang de stack niet leeg is, en
+                                                            # niet in codeblok (^x><x) of tabel (^x><><x)
+            line = ".FS\n\\m["color"]\n"footnotes[i]".FE"   # Voorzie eerstvolgende voetnoottekst uit de array van macros (en kleur)
             gsub(/x><><><x/, " ",  line)             # Niet-gangbare tijdelijke combinatie x><><><x weer terug vervangen naar spatie
             gsub(/x><><><><x/, "\t", line)           # Idem x><><><><x naar tab
             gsub(/x><><><><><x/, "\n", line)         # Idem x><><><><><x naar newline
@@ -1377,8 +1377,6 @@ awk -v title_uppercase="$title_uppercase"   -v number_headers=$number_headers  -
 }
 END { 
     print prev
-    if (table_of_contents && ! browser)         # Browser-instelling stelt TOC buiten werking !
-        print ".TC"
 }' > "$tempfile1"
 
 
@@ -1481,6 +1479,11 @@ sed 's/^x><x//' |
 
 
 ################# LET OP: VANAF HIER ZIJN DE CODE-BLOKKEN *NIET MEER* VOORZIEN VAN *MARKERS* !! #################
+
+
+# Voeg een Table-of-Contents macro toe aan het eind van de tekst in geval van optie -t (mits niet ook met optie -b):
+( cat - ; (( table_of_contents && ! browser )) && echo ".TC" ) |     # Browser-instelling stelt TOC buiten werking !
+# (construct nog testen op Mac-OS-X)
 
 
 # Verwijderen van een .br macro vóór of na een .LP of .IP regel:
