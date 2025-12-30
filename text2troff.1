@@ -4,7 +4,7 @@
 .
 .
 .SH NAME
-text2troff \(en converts a flat text-file to TROFF text format by inserting requests and `ms' macro commands. 
+text2troff \(en converts a plain-text-file to TROFF text format by inserting requests and `ms' macro commands. 
 .
 .
 .
@@ -15,7 +15,7 @@ text2troff [\fIoptions\fP] [\fIinput-file\fP]
 .
 .SH DESCRIPTION
 text2troff is a bash script that uses a combination of \f2awk\fP and \f2sed\fP filters
-to convert a flat text-file into TROFF text format, by inserting TROFF request and `ms' macro commands.
+to convert a plain-text-file into TROFF text format, by inserting TROFF request and `ms' macro commands.
 The result is sent to standard output,
 and can be processed further with available `troff' tools with `ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal (`nroff') output.
@@ -41,7 +41,7 @@ These are used by text2troff as criteria by which to `best-guess' the intended l
 .PP
 The output produced by this program shouldn't be considered as more than an approximation of any full-blown end result.
 Further polishing can be done by any additional manual placement of TROFF-requests and/or ms macros if chosen for. 
-Main intent for developing this program was the wish to be able to turn a quick-and-dirty piece of flat
+Main intent for developing this program was the wish to be able to turn a quick-and-dirty piece of plain
 text into a decently sophisticated document `at the push of a button',
 with enough options to vary its appearance.
 .
@@ -49,7 +49,7 @@ with enough options to vary its appearance.
 .
 .SH INPUT TEXT REQUIREMENTS
 .PP
-The following formatting conventions apply for flat input text in order to be interpreted properly:
+The following formatting conventions apply for plain input text in order to be interpreted properly:
 .IP "\f3Chapter headers\f1"
 shall be single text lines that are no longer than 90 characters,
 start with a capital letter or a number,
@@ -90,7 +90,7 @@ a string of any non-\f2tab\fP characters,
 followed by a \f2tab\fP only and (also in deviation of all previous possibilities) only one input text line
 .RE
 .IP "\f3Code-blocks\f1"
-are any (series of) lines that are supposed to have their literal flat text layout preserved,
+are any (series of) lines that are supposed to have their literal plain text layout preserved,
 including monospace characters, line indents, spacing and breaks, and without any additional formatting.
 To distinguish a codeblock from preceding and succeeding text, following tags shall be present,
 separated by at least a \f2space\fP, a \f2tab\fP or a \f2newline\fP character from any other text:

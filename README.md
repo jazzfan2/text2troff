@@ -1,15 +1,15 @@
 # Name: text2troff
 
 text2troff is the major part of a suite of programs consisting of:
-- text2troff - converts a flat text-file to TROFF text format by inserting requests and 'ms' macro commands.
-- text2troff_table - converts tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests. Is called by text2troff but can also be used stand-alone.
+- text2troff - converts a plain-text-file to TROFF text format by inserting requests and 'ms' macro commands.
+- text2troff_table - converts tabulated lines in a plain-text-file into TROFF formatted tables by inserting table requests. Is called by text2troff but can also be used stand-alone.
 - trofform - activates a chosen TROFF document format and deactivates any alternate document formats. Can process output from text2troff.
 
 # Description:
 
 ## text2troff
 text2troff is a bash script that uses a combination of awk and sed filters
-to convert a flat text-file into TROFF text format, by inserting TROFF request and 'ms' macro commands.
+to convert a plain-text-file into TROFF text format, by inserting TROFF request and 'ms' macro commands.
 The result is sent to standard output,
 and can be processed further with available 'troff' tools with 'ms' macro package, preferrably GNU groff_ms(7),
 to produce typeset PostScript-, PDF-, HTML- or terminal ('nroff') output.
@@ -35,13 +35,13 @@ These are used by text2troff as criteria by which to 'best-guess' the intended l
 
 The output produced by this program shouldn't be considered as more than an approximation of any full-blown end result.
 Further polishing can be done by any additional manual placement of TROFF-requests and/or ms macros if chosen for. 
-Main intent for developing this program was the wish to be able to turn a quick-and-dirty piece of flat
+Main intent for developing this program was the wish to be able to turn a quick-and-dirty piece of plain
 text into a decently sophisticated document 'at the push of a button',
 with enough options to vary its appearance.
 
 ## text2troff_table
 text2troff_table is a bash script that uses awk filtering to convert tabulated lines
-in a flat text-file into TROFF formatted tables by inserting table requests and ms macros.
+in a plain-text-file into TROFF formatted tables by inserting table requests and ms macros.
 All lines not interpreted as table lines are passed on unchanged.
 The result is sent to standard output,
 and can be processed further with available 'troff' tools with 'ms' macro package, preferrably GNU groff_ms(7),
