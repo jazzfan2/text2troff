@@ -3,7 +3,7 @@
 # Author: R.J.Toscani
 # Date  : 12-01-2024
 # Description: 'text2troff.sh' is a bash script that uses a combination of awk and sed filters to
-# convert a flat text-file into TROFF text format, by inserting TROFF request and ‘ms’ macro
+# convert a plain-text-file into TROFF text format, by inserting TROFF request and ‘ms’ macro
 # commands. The result is sent to standard output, and can be processed further with available
 # ‘troff’ tools with ‘ms’ macro package, preferrably GNU groff_ms(7), to produce typeset 
 # PostScript-, PDF-, HTML- or terminal (‘nroff’) output. As an alternative to processing a 
