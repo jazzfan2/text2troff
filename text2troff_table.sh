@@ -3,7 +3,7 @@
 # Author: R.J.Toscani
 # Date  : 26-10-2023
 # Description: 'text2troff_table.sh' is a bash script that uses awk filtering to convert 
-# tabulated lines in a flat text-file into TROFF formatted tables by inserting table requests
+# tabulated lines in a plain-text-file into TROFF formatted tables by inserting table requests
 # and ms macros. All lines not interpreted as table lines are passed on unchanged. The result
 # is sent to standard output, and can be processed further with available 'troff' tools with
 # 'ms' macro package, preferrably GNU groff_ms(7), to produce typeset PostScript-, PDF-, 
