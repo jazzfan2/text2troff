@@ -173,7 +173,7 @@ shift $(( OPTIND - 1 ))
 trap "close_off" SIGINT
 
 file="$tmpfiledir/file$RANDOM$RANDOM"
-  functions="$HOME/scripts/functions_troff"
+  functions="$HOME/scripts/functions_troff.sh"
 
 cat "$@" >| "$file"
 
