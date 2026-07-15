@@ -1,5 +1,5 @@
 ./" Manpage for your_function
-.TH TEXT2TROFF 1 "18 December 2023" "1.0"
+.TH TEXT2TROFF 1 "15 July 2026" "1.0"
 .
 .
 .
@@ -724,7 +724,7 @@ for better representation in an HTML browser.
 .LP
 text2troff breaks up code block lines
 that exceed the applicable text column margins into shorter units
-as to fit these margins as good as possible.
+as to fit these margins as well as possible.
 The resulting line lengths depend on whether or not any of the options \f3-d\fP , \f3-m\fP and/or
 \f3-c\fP have been given.
 If option \f3-b\fP is given though, code lines are not broken. 
@@ -883,6 +883,9 @@ The program doesn't support the code-blocks markers \fC[code]\fP and \fC[/code]\
 Option \fB-B\fP to remove any `solitary' bullets is not fully tested yet.
 .br
 Interpretation of apostrophs isn't flawless and may result into an opening quote depending on placement.
+.br
+A non-bulleted text block following a bulleted (sub)list after a blank line can not be made to adopt
+any bullet list indent level. Instead, always a full reset to zero indent takes place, regardless of intent.
 .br
 Page numbers and first footnote number don't adopt the general text color setting and thus remain default.
 .br
