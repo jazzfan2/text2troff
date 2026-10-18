@@ -73,5 +73,5 @@ trofform can be called both interactively (by options -I and -h) and non-interac
 See the manual pages text2troff.1, text2troff_table.1 and trofform.1, included in this repository, for full description and options.
 
 # Author:
-Written by Rob Toscani (rob_toscani@yahoo.com).
+Written by Rob Toscani (rob_toscani@yahoo.com). 
 
